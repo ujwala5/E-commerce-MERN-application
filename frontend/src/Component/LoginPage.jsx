@@ -1,5 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useFormik } from 'formik';
+import * as Yup from 'yup';
+import { useSelector, useDispatch } from 'react-redux'
+import { login } from '../features/auth/authSlice';
+import { toast } from "react-toastify";
+import { useNavigate } from 'react-router-dom';
+
 
 import {
     Box,
@@ -35,7 +41,43 @@ import {
 
 const LoginPage = () => {
 
+    const { result } = useSelector((state) => state.auth);
 
+    console.log("result==>", result);
+
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const formik = useFormik({
+        initialValues: {
+            username: '',
+            password: ''
+        },
+        valudationSchema: Yup.object({
+            username: Yup.string().email('Invalid email address').required('Username is required'),
+            password: Yup.string().required('Password is required')
+        }),
+        onSubmit: (values) => {
+            console.log("onsubmit values ==>", values)
+            dispatch(login(values)).unwrap()
+        }
+    })
+
+    useEffect(() => {
+        // console.log("result from useeffect ==>", result)
+
+        if (!result || Object.keys(result).length === 0) {
+            return;
+        }
+        if (result.code === 200) {
+            toast.success("Login successfully")
+            sessionStorage.setItem("token", result.token);
+            navigate('/home');
+        } else {
+            toast.error("Invalid Credentials")
+        }
+
+    }, [dispatch, result])
 
     return (
         <Box
@@ -86,11 +128,14 @@ const LoginPage = () => {
                             </Box>
 
                             {/* Login Form */}
-                            <form >
+                            <form onSubmit={formik.handleSubmit}>
                                 <Box sx={{ mb: 2 }}>
                                     <TextField
                                         fullWidth
                                         placeholder="Username or Email"
+                                        name="username"
+                                        value={formik.values.firstname}
+                                        onChange={formik.handleChange}
 
                                         InputProps={{
                                             startAdornment: (
@@ -119,6 +164,10 @@ const LoginPage = () => {
                                     <TextField
                                         fullWidth
                                         placeholder="Password"
+                                        name="password"
+                                        value={formik.values.password}
+                                        onChange={formik.handleChange}
+
                                         InputProps={{
                                             startAdornment: (
                                                 <InputAdornment position="start">

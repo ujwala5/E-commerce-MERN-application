@@ -1,10 +1,15 @@
-const get_auth_service = require("../services/user.service");
+const { get_auth_service, generateToken } = require("../services/user.service");
+var jwt = require('jsonwebtoken');
 
 const get_auth_controller = async (req, res) => {
     try {
         let bodydata = req.body;
         const get_auth_serviceRes = await get_auth_service(bodydata);
         console.log("get_auth_serviceRes ==>", get_auth_serviceRes);
+
+        const getAuthToken = await generateToken(bodydata);
+        console.log("getAuthToken ==>", getAuthToken);
+
         if (get_auth_serviceRes == null) {
             res.json({
                 "code": 100,
@@ -15,7 +20,8 @@ const get_auth_controller = async (req, res) => {
             res.json({
                 "code": 200,
                 "status": "Success",
-                "message": "Login successfully"
+                "message": "Login successfully",
+                "token": getAuthToken
             })
         }
 

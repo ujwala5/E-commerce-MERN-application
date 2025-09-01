@@ -1,4 +1,5 @@
 const db = require('../database/db');
+const jwt = require("jsonwebtoken");
 
 const get_auth_service = async (bodydata) => {
     try {
@@ -23,4 +24,32 @@ const get_auth_service = async (bodydata) => {
     }
 };
 
-module.exports = get_auth_service;
+const generateToken = async (bodydata) => {
+    try {
+
+        const { username, password } = bodydata;
+
+        const JWT_SECRET = "mySecretKey";
+
+        // Fake user (for demo purpose)
+        const payload = {
+            username: username,
+            password: password
+        };
+
+        let token = jwt.sign(payload, JWT_SECRET, { expiresIn: "1h" });
+        // console.log("token==>>", token);
+        return token;
+
+
+    } catch (err) {
+        console.error("DB Error:", err);
+        throw err;
+    }
+}
+
+module.exports = {
+    get_auth_service,
+    generateToken
+}
+
