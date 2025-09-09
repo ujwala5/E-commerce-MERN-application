@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import { useNavigate } from 'react-router-dom';
 
 
+
 import {
     Box,
     Container,
@@ -328,7 +329,11 @@ const LoginPage = () => {
                             <Box sx={{ textAlign: 'center' }}>
                                 <Typography variant="body2" color="text.secondary">
                                     Don't have an account?{' '}
-                                    <Typography
+
+                                    <Button onClick={() => { navigate('/signup') }} variant="text">signUp</Button>
+
+
+                                    {/* <Button
                                         component="a"
                                         href="#"
                                         color="primary"
@@ -341,7 +346,7 @@ const LoginPage = () => {
                                         }}
                                     >
                                         Sign Up
-                                    </Typography>
+                                    </Button> */}
                                 </Typography>
                             </Box>
                         </Box>

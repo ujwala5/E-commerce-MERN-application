@@ -15,10 +15,11 @@ app.use(cors({
 }));
 
 const authRouter = require('./router/user.router');
+const productDetail = require('./router/product.router')
 
 app.use('/v1', authRouter);
+app.use('/v1', productDetail)
 
 app.listen(port, () => {
     console.log(`App running on port ${port}`)
 });
-

@@ -29,7 +29,7 @@ const generateToken = async (bodydata) => {
 
         const { username, password } = bodydata;
 
-        const JWT_SECRET = "mySecretKey";
+        const JWT_SECRET = process.env.JWT_SECRET_KEY || "my_secret_key";
 
         // Fake user (for demo purpose)
         const payload = {
