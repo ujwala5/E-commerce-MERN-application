@@ -1,22 +1,39 @@
 const db = require('../database/db');
 const jwt = require("jsonwebtoken");
+const CryptoJS = require("crypto-js");
 
 const get_auth_service = async (bodydata) => {
     try {
-        const { username, password } = bodydata;
+        const { email, password } = bodydata;
 
-        if (!username || !password) {
-            throw new Error("Username and Password are required");
-        }
+        // if (!email || !password) {
+        //     throw new Error("Username and Password are required");
+        // }
 
-        const query = "SELECT * FROM ecommerce.users where username = ? AND password = ?";
-        const values = [username, password];
+        // Decrypt function
+        // function decryptPassword(ciphertext) {
+        //     const bytes = CryptoJS.AES.decrypt(ciphertext, SECRET_KEY);
+        //     return bytes.toString(CryptoJS.enc.Utf8); // decode back to text
+        // }
+
+        const query = "SELECT * FROM ecommerce.users where email = ?";
+        const values = [email];
 
         const [rows] = await db.query(query, values);
 
         console.log("SQL Result:", rows);
 
-        return rows.length > 0 ? rows[0] : null;
+        const encryptedPass = rows[0].password;
+        console.log("encryptedPass ==>", encryptedPass);
+        const SECRET_KEY = "my-very-secret-key";
+
+        const bytes = CryptoJS.AES.decrypt(encryptedPass, SECRET_KEY);
+        const decryptedPass = bytes.toString(CryptoJS.enc.Utf8); // decode back to text
+        console.log("decryptedPass ==>>", decryptedPass);
+
+        if (decryptedPass === password) {
+            return rows.length > 0 ? rows[0] : null;
+        }
 
     } catch (err) {
         console.error("DB Error:", err);
@@ -27,13 +44,13 @@ const get_auth_service = async (bodydata) => {
 const generateToken = async (bodydata) => {
     try {
 
-        const { username, password } = bodydata;
+        const { email, password } = bodydata;
 
         const JWT_SECRET = process.env.JWT_SECRET_KEY || "my_secret_key";
 
         // Fake user (for demo purpose)
         const payload = {
-            username: username,
+            username: email,
             password: password
         };
 
@@ -48,8 +65,42 @@ const generateToken = async (bodydata) => {
     }
 }
 
+const registerService = async (bodydata) => {
+    console.log({ bodydata });
+    const { nameRes, mobile, email, password } = bodydata;
+
+    const SECRET_KEY = "my-very-secret-key";
+
+    // Encrypt function
+    // function encryptPassword(password) {
+    //     return CryptoJS.AES.encrypt(password, SECRET_KEY).toString();
+    // }
+
+    let encryptedPass = CryptoJS.AES.encrypt(password, SECRET_KEY).toString();
+    console.log("encryptedPass ===>>", encryptedPass);
+
+    const query = 'INSERT INTO ecommerce.users (username, mobile, email, password) VALUES(?,?,?,?)';
+    const values = [nameRes, mobile, email, encryptedPass];
+    const result = await db.query(query, values);
+    return result[0];
+}
+
+const checkUsernameExists = async (email) => {
+    let query = "SELECT * FROM users where email = ?";
+    let values = [email];
+    let result = await db.query(query, values);
+    console.log("checkUsernameExists result ==>", result);
+    if (result[0].length > 0) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 module.exports = {
     get_auth_service,
-    generateToken
+    generateToken,
+    registerService,
+    checkUsernameExists
 }
 

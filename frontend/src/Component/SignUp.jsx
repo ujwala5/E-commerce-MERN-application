@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-
-
+import { useDispatch, useSelector } from 'react-redux';
+import { register } from '../features/auth/authSlice';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import {
     Box,
     Button,
@@ -12,6 +14,11 @@ import {
 } from "@mui/material";
 
 const Signup = () => {
+
+    const { registerRes, loading, error } = useSelector((state) => state.auth);
+
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const formik = useFormik({
         initialValues: {
@@ -40,8 +47,21 @@ const Signup = () => {
         }),
         onSubmit: values => {
             console.log("values ==>", values);
+            dispatch(register(values));
         }
     })
+
+    useEffect(() => {
+        // console.log({ registerRes });
+        if (registerRes.code === 200) {
+            navigate('/login')
+            toast.success("User registered successfully");
+        } else if (registerRes.code === 100) {
+            toast.error("User already registered");
+        } else {
+            toast.error("Something went wrong");
+        }
+    }, [registerRes])
 
     return (
         <Box
@@ -64,9 +84,11 @@ const Signup = () => {
                         name="name"
                         value={formik.values.name}
                         onChange={formik.handleChange}
-                        error={formik.errors}
                         margin="normal"
                     />
+                    {formik.touched.name && formik.errors.name ? (
+                        <div style={{ color: "red" }}>{formik.errors.name}</div>
+                    ) : null}
 
                     {/* Mobile */}
                     <TextField
@@ -75,9 +97,11 @@ const Signup = () => {
                         name="mobile"
                         value={formik.values.mobile}
                         onChange={formik.handleChange}
-                        error={formik.errors}
                         margin="normal"
                     />
+                    {formik.touched.mobile && formik.errors.mobile ? (
+                        <div style={{ color: "red" }}>{formik.errors.mobile}</div>
+                    ) : null}
 
                     {/* Email */}
                     <TextField
@@ -87,9 +111,12 @@ const Signup = () => {
                         type="email"
                         value={formik.values.email}
                         onChange={formik.handleChange}
-                        error={formik.errors}
                         margin="normal"
                     />
+
+                    {formik.touched.email && formik.errors.email ? (
+                        <div style={{ color: "red" }}>{formik.errors.email}</div>
+                    ) : null}
 
                     {/* Password */}
                     <TextField
@@ -99,10 +126,12 @@ const Signup = () => {
                         type="password"
                         value={formik.values.password}
                         onChange={formik.handleChange}
-                        error={formik.errors}
 
                         margin="normal"
                     />
+                    {formik.touched.password && formik.errors.password ? (
+                        <div style={{ color: "red" }}>{formik.errors.password}</div>
+                    ) : null}
 
                     {/* Confirm Password */}
                     <TextField
@@ -112,10 +141,11 @@ const Signup = () => {
                         type="password"
                         value={formik.values.confirmPassword}
                         onChange={formik.handleChange}
-                        error={formik.errors}
-
                     />
 
+                    {formik.touched.confirmPassword && formik.errors.confirmPassword ? (
+                        <div style={{ color: "red" }}>{formik.errors.confirmPassword}</div>
+                    ) : null}
                     <Button
                         type="submit"
                         fullWidth
