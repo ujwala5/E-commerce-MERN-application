@@ -15,7 +15,7 @@ import {
 
 const Signup = () => {
 
-    const { registerRes, loading, error } = useSelector((state) => state.auth);
+    let { registerRes, loading, error } = useSelector((state) => state.auth);
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -56,10 +56,9 @@ const Signup = () => {
         if (registerRes.code === 200) {
             navigate('/login')
             toast.success("User registered successfully");
+            registerRes = "";
         } else if (registerRes.code === 100) {
             toast.error("User already registered");
-        } else {
-            toast.error("Something went wrong");
         }
     }, [registerRes])
 

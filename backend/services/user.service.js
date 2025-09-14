@@ -4,8 +4,9 @@ const CryptoJS = require("crypto-js");
 
 const get_auth_service = async (bodydata) => {
     try {
-        const { email, password } = bodydata;
+        const { username, password } = bodydata;
 
+        // console.log({ bodydata });
         // if (!email || !password) {
         //     throw new Error("Username and Password are required");
         // }
@@ -13,11 +14,15 @@ const get_auth_service = async (bodydata) => {
         // Decrypt function
         // function decryptPassword(ciphertext) {
         //     const bytes = CryptoJS.AES.decrypt(ciphertext, SECRET_KEY);
-        //     return bytes.toString(CryptoJS.enc.Utf8); // decode back to text
+        //     const res = bytes.toString(CryptoJS.enc.Utf8); // decode back to text
+
+        //     console.log({ res });
         // }
 
+        // decryptPassword("U2FsdGVkX18Xe9Pxlgm/YO9OxFzHUDRrOf53QYN72f0=");
+
         const query = "SELECT * FROM ecommerce.users where email = ?";
-        const values = [email];
+        const values = [username];
 
         const [rows] = await db.query(query, values);
 
