@@ -4,6 +4,7 @@ import React from 'react'
 import LoginPage from '../Component/LoginPage';
 import Home from '../pages/Home';
 import SignUp from '../Component/SignUp';
+import Forgot_password from '../pages/Forgot_password';
 
 function AppRoutes() {
     return (
@@ -13,6 +14,8 @@ function AppRoutes() {
                     <Route path='/login' element={<LoginPage />} />
                     <Route path='/home' element={<Home />} />
                     <Route path='/signup' element={<SignUp />} />
+                    <Route path='/forgotPassword' element={<Forgot_password />} />
+
                 </Routes>
             </BrowserRouter>
 

@@ -102,10 +102,46 @@ const checkUsernameExists = async (email) => {
     }
 }
 
+const getUserIdByEmail = async (email) => {
+    try {
+
+        let query = "SELECT * FROM users where email = ?";
+        let values = [email];
+        let result = await db.query(query, values);
+        console.log("getUserIdByEmail ==>>", result);
+        return result[0];
+
+    } catch (err) {
+
+    }
+}
+
+const encryptedPassRes = async (pass) => {
+
+    const SECRET_KEY = "my-very-secret-key";
+
+    let encryptedPass = CryptoJS.AES.encrypt(pass, SECRET_KEY).toString();
+    console.log("encryptedPass ===>>", encryptedPass);
+    return encryptedPass;
+
+}
+
+const resetPass_service = async (pass, id) => {
+
+    let query = 'UPDATE users set password = ? where id = ?';
+    let value = [pass, id];
+    let result = await db.query(query, value);
+    console.log("result ==>>", result);
+    return result[0];
+}
+
 module.exports = {
     get_auth_service,
     generateToken,
     registerService,
-    checkUsernameExists
+    checkUsernameExists,
+    getUserIdByEmail,
+    encryptedPassRes,
+    resetPass_service
 }
 
