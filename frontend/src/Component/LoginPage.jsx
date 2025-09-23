@@ -605,6 +605,7 @@ const LoginPage = () => {
                                             textDecoration: 'underline'
                                         }
                                     }}
+                                    onClick={() => navigate('/forgotPassword')}
                                 >
                                     Forgot Password?
                                 </Typography>
@@ -655,30 +656,6 @@ const LoginPage = () => {
                             <Divider sx={{ flexGrow: 1, borderColor: '#eaeaec' }} />
                         </Box>
 
-                        {/* OTP Login Option */}
-                        <Button
-                            fullWidth
-                            variant="outlined"
-                            size="large"
-                            sx={{
-                                py: 1.2,
-                                borderRadius: '4px',
-                                fontSize: '0.9rem',
-                                fontWeight: '600',
-                                borderColor: '#d4d5d9',
-                                color: '#282c3f',
-                                textTransform: 'none',
-                                mb: 2,
-                                '&:hover': {
-                                    borderColor: '#ff3f6c',
-                                    backgroundColor: 'rgba(255, 63, 108, 0.04)'
-                                }
-                            }}
-                            onClick={() => navigate('/otp-login')}
-                        >
-                            Login with OTP
-                        </Button>
-
                         {/* Social Login */}
                         <Typography variant="body2" sx={{ textAlign: 'center', mb: 2, color: '#696b79' }}>
                             Login via social platforms
@@ -699,7 +676,12 @@ const LoginPage = () => {
                                         backgroundColor: '#3b5998',
                                         color: 'white',
                                     }
+
                                 }}
+
+                                href="https://www.facebook.com"
+                                target="_blank"
+                                rel="noopener noreferrer"
                             >
                                 <Facebook sx={{ fontSize: '20px' }} />
                             </IconButton>
@@ -714,6 +696,9 @@ const LoginPage = () => {
                                         color: 'white',
                                     }
                                 }}
+                                href="https://www.google.com"
+                                target="_blank"
+                                rel="noopener noreferrer"
                             >
                                 <Google sx={{ fontSize: '20px' }} />
                             </IconButton>

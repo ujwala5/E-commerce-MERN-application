@@ -1,5 +1,8 @@
 const { get_auth_service, generateToken, registerService, checkUsernameExists, getUserIdByEmail, resetPass_service, encryptedPassRes } = require("../services/user.service");
 var jwt = require('jsonwebtoken');
+const nodemailer = require("nodemailer");
+const dotenv = require('dotenv');
+dotenv.config();
 
 const get_auth_controller = async (req, res) => {
     try {
@@ -68,28 +71,66 @@ const register_controller = async (req, res) => {
 
 const forgotPassword_controller = async (req, res) => {
     try {
-        const bodyData = req.body.emailId;
-        const forgotPassword_controller_res = await getUserIdByEmail(bodyData);
+        const emailId = req.body.emailId;
+        const forgotPassword_controller_res = await getUserIdByEmail(emailId);
         console.log("forgotPassword_controller_res==>>", forgotPassword_controller_res);
-        let userId = forgotPassword_controller_res[0].id;
-        console.log("userId ==>", userId);
+        if (forgotPassword_controller_res.length > 0) {
 
-        const JWT_SECRET = process.env.JWT_SECRET_KEY || "my_secret_key";
+            let userId = forgotPassword_controller_res[0].id;
+            console.log("userId ==>", userId);
 
-        // Fake user (for demo purpose)
-        const payload = {
-            userId: userId
-        };
+            const JWT_SECRET = process.env.JWT_SECRET_KEY || "my_secret_key";
 
-        let token = jwt.sign(payload, JWT_SECRET, { expiresIn: "15m" });
-        console.log("token==>>", token);
+            // Fake user (for demo purpose)
+            const payload = {
+                userId: userId
+            };
 
-        res.send({
-            "code": 200,
-            "status": "Success",
-            "message": "Data Inserted successfully",
-            "data": `http://localhost:3000/V1/forgotPassword/${token}`
-        })
+            let token = jwt.sign(payload, JWT_SECRET, { expiresIn: "15m" });
+            console.log("token==>>", token);
+
+            let transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: process.env.EMAIL_ID,
+                    pass: process.env.APP_PASSWORD
+                }
+            });
+
+            // Mail options
+            let mailOptions = {
+                from: process.env.EMAIL_ID,
+                to: emailId,
+                subject: "Reset your password",
+                text: `Please click on the below link to reset your password : 
+                
+                http://localhost:3000/V1/forgotPassword/${token}`
+
+            };
+
+            // Send email
+            transporter.sendMail(mailOptions, (error, info) => {
+                if (error) {
+                    return console.log("Error: ", error);
+                }
+                console.log("Email sent: " + info.response);
+            });
+
+
+            res.send({
+                "code": 200,
+                "status": "Success",
+                "message": "Password reset link sent successfully",
+                "data": `http://localhost:3000/V1/forgotPassword/${token}`
+            })
+        } else {
+            res.send({
+                "code": 404,
+                "status": "Failed",
+                "message": "Email Id is not registered"
+            })
+        }
+
 
     } catch (error) {
         console.log("error", error.message);

@@ -17,7 +17,7 @@ export const login = createAsyncThunk('/Auth/login', async (values) => {
 })
 
 export const register = createAsyncThunk('/Auth/register', async (values) => {
-    console.log("login : values from asynthunk", values);
+    console.log("login : values from register asynthunk", values);
     const result = await axios.post('http://localhost:3000/V1/register', {
         header: {
             'Content-Type': "application/Json"
@@ -25,9 +25,36 @@ export const register = createAsyncThunk('/Auth/register', async (values) => {
         nameRes: values.name,
         mobile: values.mobile,
         email: values.email,
-        password: values.password,
+        password: values.password
     })
     console.log("result", result);
+    return result.data;
+
+})
+
+export const forgotPasswordReducer = createAsyncThunk('/Auth/forgotPassword', async (values) => {
+    console.log("forgotPassword : values from forgotPassword asynthunk", values);
+    const result = await axios.post('http://localhost:3000/V1/forgotPassword', {
+        header: {
+            'Content-Type': "application/Json"
+        },
+
+        emailId: values.email
+    })
+    console.log("forgotPasswordReducer result", result);
+    return result.data;
+})
+
+export const resetPasswordReducer = createAsyncThunk('/Auth/resetPasswordReducer', async (values) => {
+    console.log("resetPasswordReducer : values from resetPasswordReducer asynthunk", values);
+    const result = await axios.post('http://localhost:3000/V1/resetPassword/1', {
+        header: {
+            'Content-Type': "application/Json"
+        },
+
+        Password: values.password
+    })
+    console.log("resetPasswordReducer result ==>", result);
     return result.data;
 
 })
@@ -38,7 +65,9 @@ export const authSlice = createSlice({
         loading: false,
         error: null,
         registerRes: {},
-        result: {}
+        result: {},
+        forgetPassword: {},
+        resetPasswordRes: {}
     },
     reducers: {
 
@@ -63,6 +92,7 @@ export const authSlice = createSlice({
 
             //register
             .addCase(register.pending, (state) => {
+                state.loading = true;
                 state.error = null;
             })
             .addCase(register.fulfilled, (state, action) => {
@@ -72,6 +102,34 @@ export const authSlice = createSlice({
 
             })
             .addCase(register.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message
+            })
+
+            //forgot password
+            .addCase(forgotPasswordReducer.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(forgotPasswordReducer.fulfilled, (state, action) => {
+                state.loading = false;
+                state.forgetPassword = action.payload
+            })
+            .addCase(forgotPasswordReducer.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message
+            })
+
+            //Reset password
+            .addCase(resetPasswordReducer.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(resetPasswordReducer.fulfilled, (state, action) => {
+                state.loading = false;
+                state.resetPasswordRes = action.payload;
+            })
+            .addCase(resetPasswordReducer.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.error.message
             })

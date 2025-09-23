@@ -2,9 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
-import { register } from '../features/auth/authSlice';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { forgotPasswordReducer } from '../features/auth/authSlice';
 import {
     Box,
     Button,
@@ -28,11 +28,12 @@ import {
 } from '@mui/icons-material';
 
 const Forgot_password = () => {
-    const { registerRes, loading, error } = useSelector((state) => state.auth);
+    const { forgetPassword, loading, error } = useSelector((state) => state.auth);
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
 
     const formik = useFormik({
         initialValues: {
@@ -42,18 +43,18 @@ const Forgot_password = () => {
             email: Yup.string().email('Invalid email address').required('Email is required'),
         }),
         onSubmit: values => {
-            // dispatch(register(values));
+            dispatch(forgotPasswordReducer(values));
         }
     });
 
     useEffect(() => {
-        if (registerRes?.code === 200) {
-            navigate('/login');
-            toast.success("User registered successfully");
-        } else if (registerRes?.code === 100) {
-            toast.error("User already registered");
+        if (forgetPassword?.code === 200) {
+            // navigate('/login');
+            toast.success("Password reset link has been sent on registered email successfully");
+        } else if (forgetPassword?.code === 404) {
+            toast.error("Email is not registered");
         }
-    }, [registerRes, navigate]);
+    }, [dispatch, forgetPassword]);
 
     return (
         <Box
