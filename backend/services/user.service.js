@@ -1,6 +1,7 @@
 const db = require('../database/db');
 const jwt = require("jsonwebtoken");
 const CryptoJS = require("crypto-js");
+const { decryptPass } = require('../utils/utils');
 
 const get_auth_service = async (bodydata) => {
     try {
@@ -30,13 +31,18 @@ const get_auth_service = async (bodydata) => {
 
         const encryptedPass = rows[0].password;
         console.log("encryptedPass ==>", encryptedPass);
-        const SECRET_KEY = "my-very-secret-key";
+        const SECRET_KEY = process.env.JWT_SECRET_KEY;
 
-        const bytes = CryptoJS.AES.decrypt(encryptedPass, SECRET_KEY);
-        const decryptedPass = bytes.toString(CryptoJS.enc.Utf8); // decode back to text
-        console.log("decryptedPass ==>>", decryptedPass);
+        console.log("secret key ==>", SECRET_KEY);
 
-        if (decryptedPass === password) {
+        const decryptPassRes = await decryptPass(encryptedPass);
+
+        // const bytes = CryptoJS.AES.decrypt(encryptedPass, SECRET_KEY);
+        // console.log("bytes ==> ", bytes);
+        // const decryptedPass = bytes.toString(CryptoJS.enc.Utf8); // decode back to text
+        console.log("decryptedPass ==>>", decryptPassRes);
+
+        if (decryptPassRes === password) {
             return rows.length > 0 ? rows[0] : null;
         }
 
@@ -51,7 +57,7 @@ const generateToken = async (bodydata) => {
 
         const { email, password } = bodydata;
 
-        const JWT_SECRET = process.env.JWT_SECRET_KEY || "my_secret_key";
+        const JWT_SECRET = process.env.JWT_SECRET_KEY;
 
         // Fake user (for demo purpose)
         const payload = {
@@ -74,7 +80,7 @@ const registerService = async (bodydata) => {
     console.log({ bodydata });
     const { nameRes, mobile, email, password } = bodydata;
 
-    const SECRET_KEY = "my-very-secret-key";
+    const SECRET_KEY = process.env.JWT_SECRET_KEY;
 
     // Encrypt function
     // function encryptPassword(password) {
@@ -112,13 +118,13 @@ const getUserIdByEmail = async (email) => {
         return result[0];
 
     } catch (err) {
-
+        console.log("err", err.message);
     }
 }
 
 const encryptedPassRes = async (pass) => {
 
-    const SECRET_KEY = "my-very-secret-key";
+    const SECRET_KEY = process.env.JWT_SECRET_KEY;
 
     let encryptedPass = CryptoJS.AES.encrypt(pass, SECRET_KEY).toString();
     console.log("encryptedPass ===>>", encryptedPass);

@@ -3,6 +3,7 @@ var jwt = require('jsonwebtoken');
 const nodemailer = require("nodemailer");
 const dotenv = require('dotenv');
 dotenv.config();
+const CryptoJS = require("crypto-js");
 
 const get_auth_controller = async (req, res) => {
     try {
@@ -62,7 +63,6 @@ const register_controller = async (req, res) => {
                 "message": "User already registered"
             })
         }
-
 
     } catch (err) {
         console.log("error in register controller", err);
@@ -142,8 +142,11 @@ const resetPass_controller = async (req, res) => {
         const bodyData = req.body.password;
         const id = req.params.id;
 
-        const encryptedPass = await encryptedPassRes(bodyData);
-        console.log("encryptedPass ==>>", encryptedPass);
+        // const encryptedPass = await encryptedPassRes(bodyData);
+        // console.log("encryptedPass ==>>", encryptedPass);
+        let SECRET_KEY = process.env.JWT_SECRET_KEY;
+        let encryptedPass = CryptoJS.AES.encrypt(bodyData, SECRET_KEY).toString();
+        console.log("resetPass encryptedPass ==>>", encryptedPass)
 
         const resetPass_serviceRes = await resetPass_service(encryptedPass, id)
         console.log("resetPass_serviceRes ==>", resetPass_serviceRes);

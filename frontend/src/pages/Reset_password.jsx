@@ -56,8 +56,6 @@ const ResetPasswordPage = () => {
     if (resetPasswordRes.code === 200) {
       toast.success('Password has been changed successfully');
       navigate('/login');
-    } else {
-      toast.error('Something went wrong');
     }
   }, [dispatch, resetPasswordRes])
 
